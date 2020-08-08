@@ -126,7 +126,7 @@ class Differ:
 			return
 
 		df_1_differences, df_2_differences = self.get_dataframe_differences(df_1, df_2)
-		self.create_diff_report_file(df_2_differences, df_2_differences)
+		self.create_diff_report_file(df_1_differences, df_2_differences)
 
 		self.show_diff_complete_info(
 			"The two files are not identical to each other. Please open the file titled 'DIFF LAB OUTPUT' with the "
