@@ -5,8 +5,15 @@ import pandas as pd
 import tkinter as tk
 import tkinter.messagebox as messagebox
 
+from enum import Enum
 
-SUPPORTED_EXTENSIONS = [".csv", ".xlsx"]
+
+class Extensions(Enum):
+	XLSX = ".xlsx"
+	CSV = ".csv"
+
+
+SUPPORTED_EXTENSIONS = [Extensions.XLSX.value, Extensions.CSV.value]
 FONT = ("helvetica", 12, "bold")
 FILE_1_NAME = "Name of first file:"
 FILE_2_NAME = "Name of second file:"
@@ -135,9 +142,9 @@ class Differ:
 		)
 
 	def open_file_as_dataframe(self, file_path, extension):
-		if extension == ".xlsx":
+		if extension == Extensions.XLSX.value:
 			return pd.read_excel(file_path, index_col=None, header=None)
-		elif extension == ".csv":
+		elif extension == Extensions.CSV.value:
 			return pd.read_csv(file_path, index_col=None, header=None)
 
 	def validate_dataframe_structures(self, df_1, df_2):
