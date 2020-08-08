@@ -68,8 +68,9 @@ class Differ:
 	def diff_files(self):
 		file_1_name = self.file_1_value.get()
 		file_2_name = self.file_2_value.get()
+		valid_file_names, extension = self.validate_file_names(file_1_name, file_2_name)
 
-		if not self.validate_file_names(file_1_name, file_2_name):
+		if not valid_file_names:
 			return
 
 		file_1_path = self.get_file_path(file_1_name)
@@ -79,30 +80,30 @@ class Differ:
 			if not self.validate_file_path(file_path):
 				return
 
-		self.compare_files(file_1_path, file_2_path)
+		self.compare_files(file_1_path, file_2_path, extension)
 
 	def validate_file_names(self, file_1_name, file_2_name):
 		if not file_1_name or not file_2_name:
 			self.show_error("You must provide both file names.")
-			return False
+			return False, None
 
 		file_1_ext = os.path.splitext(file_1_name)[1]
 		file_2_ext = os.path.splitext(file_2_name)[1]
 
 		if not file_1_ext or not file_2_ext:
 			self.show_error("You must include the extension for both files.")
-			return False
+			return False, None
 
 		for extension in [file_1_ext, file_2_ext]:
 			if extension not in SUPPORTED_EXTENSIONS:
 				self.show_error(f"The extension '{extension}' is not supported.")
-				return False
+				return False, None
 
 		if file_1_ext != file_2_ext:
 			self.show_error("The two files have different extensions.")
-			return False
+			return False, None
 
-		return True
+		return True, file_1_ext
 
 	def get_file_path(self, file_name):
 		return f"{CURRENT_PATH}\\{file_name}"
@@ -114,9 +115,9 @@ class Differ:
 
 		return True
 
-	def compare_files(self, file_1_path, file_2_path):
-		df_1 = pd.read_excel(file_1_path, index_col=None, header=None)
-		df_2 = pd.read_excel(file_2_path, index_col=None, header=None)
+	def compare_files(self, file_1_path, file_2_path, extension):
+		df_1 = self.open_file_as_dataframe(file_1_path, extension)
+		df_2 = self.open_file_as_dataframe(file_2_path, extension)
 
 		if not self.validate_dataframe_structures(df_1, df_2):
 			return
@@ -132,6 +133,12 @@ class Differ:
 			"The two files are not identical to each other. Please open the file titled 'DIFF LAB OUTPUT' with the "
 			"appropriate time stamp in your current directory to view the differences."
 		)
+
+	def open_file_as_dataframe(self, file_path, extension):
+		if extension == ".xlsx":
+			return pd.read_excel(file_path, index_col=None, header=None)
+		elif extension == ".csv":
+			return pd.read_csv(file_path, index_col=None, header=None)
 
 	def validate_dataframe_structures(self, df_1, df_2):
 		error_message = "Cannot compare files with different structures."
