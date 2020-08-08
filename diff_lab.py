@@ -133,9 +133,6 @@ class Differ:
 			"appropriate time stamp in your current directory to view the differences."
 		)
 
-		# TODO: Write tests.
-		# TODO: Handle merged cells.
-
 	def validate_dataframe_structures(self, df_1, df_2):
 		error_message = "Cannot compare files with different structures."
 		df_1_cols = df_1.shape[1]
