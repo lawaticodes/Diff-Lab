@@ -118,30 +118,44 @@ class Differ:
 		df_1 = pd.read_excel(file_1_path, index_col=None, header=None)
 		df_2 = pd.read_excel(file_2_path, index_col=None, header=None)
 
-		df_1_col_len = df_1.shape[1]
-		df_2_col_len = df_2.shape[1]
-
-		if df_1_col_len != df_2_col_len:
-			self.show_error(
-				f"Cannot compare files with different structure. File 1 has {df_1_col_len} columns and file 2 has {df_2_col_len} columns."
-			)
+		if not self.validate_dataframe_structures(df_1, df_2):
 			return
-
-		df_1_row_len = df_1.shape[0]
-		df_2_row_len = df_2.shape[0]
-
-		if df_1_row_len != df_2_row_len:
-			self.show_error(
-				f"Cannot compare files with different structure. File 1 has {df_1_row_len} rows and file 2 has {df_2_row_len} rows."
-			)
-			return
-
-		columns = df_1.columns.tolist()
 
 		if df_1.equals(df_2):
 			self.show_diff_complete_info("The two files are identical to each other.")
 			return
 
+		df_1_differences, df_2_differences = self.get_dataframe_differences(df_1, df_2)
+		self.create_diff_report_file(df_2_differences, df_2_differences)
+
+		self.show_diff_complete_info(
+			"The two files are not identical to each other. Please open the file titled 'DIFF LAB OUTPUT' with the "
+			"appropriate time stamp in your current directory to view the differences."
+		)
+
+		# TODO: Write tests.
+		# TODO: Handle merged cells.
+
+	def validate_dataframe_structures(self, df_1, df_2):
+		error_message = "Cannot compare files with different structures."
+		df_1_cols = df_1.shape[1]
+		df_2_cols = df_2.shape[1]
+
+		if df_1_cols != df_2_cols:
+			self.show_error(f"{error_message} File 1 has {df_1_cols} columns and file 2 has {df_2_cols} columns.")
+			return False
+
+		df_1_rows = df_1.shape[0]
+		df_2_rows = df_2.shape[0]
+
+		if df_1_rows != df_2_rows:
+			self.show_error(f"{error_message} File 1 has {df_1_rows} rows and file 2 has {df_2_rows} rows.")
+			return False
+
+		return True
+
+	def get_dataframe_differences(self, df_1, df_2):
+		columns = df_1.columns.tolist()
 		df_1_differences = {}
 		df_2_differences = {}
 
@@ -149,39 +163,28 @@ class Differ:
 			df_1_values = []
 			df_2_values = []
 
-		for df_1_value, df_2_value in zip(df_1[col].tolist(), df_2[col].tolist()):
-			if df_1_value == df_2_value:
-				df_1_values.append(np.nan)
-				df_2_values.append(np.nan)
-			else:
-				df_1_values.append(df_1_value)
-				df_2_values.append(df_2_value)
+			for df_1_value, df_2_value in zip(df_1[col].tolist(), df_2[col].tolist()):
+				if df_1_value == df_2_value:
+					df_1_values.append(np.nan)
+					df_2_values.append(np.nan)
+				else:
+					df_1_values.append(df_1_value)
+					df_2_values.append(df_2_value)
 
-		df_1_differences[col] = df_1_values
-		df_2_differences[col] = df_2_values
+			df_1_differences[col] = df_1_values
+			df_2_differences[col] = df_2_values
 
-		df_1_differences_df = pd.DataFrame.from_dict(df_1_differences)
-		df_2_differences_df = pd.DataFrame.from_dict(df_2_differences)
+		return pd.DataFrame.from_dict(df_1_differences), pd.DataFrame.from_dict(df_2_differences)
 
-		now = datetime.datetime.now()
-		now_str = now.strftime("%d-%m-%Y_%H-%M-%S")
-		diff_file_name = f"DIFF LAB OUTPUT {now_str}.xlsx"
+	def create_diff_report_file(self, df_1_differences,  df_2_differences):
+		df_1_differences = df_1_differences.style.applymap(lambda v: self.apply_background_colour(v))
+		df_2_differences = df_2_differences.style.applymap(lambda v: self.apply_background_colour(v))
+		timestamp = datetime.datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
+		file_name = f"DIFF LAB OUTPUT {timestamp}.xlsx"
 
-		df_1_differences_df = df_1_differences_df.style.applymap(lambda v: self.apply_background_colour(v))
-		df_2_differences_df = df_2_differences_df.style.applymap(lambda v: self.apply_background_colour(v))
-
-		with pd.ExcelWriter(diff_file_name, mode="w") as writer:
-			df_1_differences_df.to_excel(writer, sheet_name="File 1 differences", header=False, index=False)
-			df_2_differences_df.to_excel(writer, sheet_name="File 2 differences", header=False, index=False)
-
-		self.show_diff_complete_info(
-			"The two files are not identical to each other. Please open the file titled 'DIFF LAB OUTPUT' with the "
-			"appropriate time stamp in your current directory to view the differences."
-		)
-
-		# TODO: Tidy code and break up into smaller functions.
-		# TODO: Write tests.
-		# TODO: Handle merged cells.
+		with pd.ExcelWriter(file_name, mode="w") as writer:
+			df_1_differences.to_excel(writer, sheet_name="File 1 differences", header=False, index=False)
+			df_2_differences.to_excel(writer, sheet_name="File 2 differences", header=False, index=False)
 
 	def apply_background_colour(self, value):
 		colour = "green" if pd.isnull(value) else "red"
