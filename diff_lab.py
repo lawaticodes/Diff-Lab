@@ -16,6 +16,11 @@ class Extensions(Enum):
 SUPPORTED_EXTENSIONS = [Extensions.XLSX.value, Extensions.CSV.value]
 FONT = ("helvetica", 12, "bold")
 CURRENT_PATH = os.getcwd()
+DESCRIPTION = (
+	"Welcome to DIFF LAB!\n\nTo start diffing, please enter below the full names of the files you would like to "
+	"compare (including the extensions). Both files must be present in your current directory.\n\nThe extensions "
+	"currently supported are:"
+)
 
 
 class Differ:
@@ -57,11 +62,7 @@ class Differ:
 
 	def get_description(self):
 		"""Return the description of the program."""
-		description = (
-			"Welcome to DIFF LAB!\n\nTo start diffing, please enter below the full names of the files you would like "
-			"to compare (including the extensions). Both files must be present in your current directory.\n\nThe "
-			"extensions currently supported are:"
-		)
+		description = DESCRIPTION
 
 		for extension in SUPPORTED_EXTENSIONS:
 			description += f"\n {extension}"
