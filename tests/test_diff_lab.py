@@ -1,7 +1,8 @@
+import numpy as np
 import os
+import pandas as pd
 import tkinter as tk
 
-import pandas as pd
 from unittest import mock
 from unittest import TestCase
 
@@ -104,24 +105,45 @@ class DiffLabTestCase(TestCase):
 	# Test validate_dataframe_structures().
 
 	def test_different_number_of_columns(self, mock_show_error):
-		df_1 = pd.DataFrame({"Col 1": [1, 2]})
-		df_2 = pd.DataFrame({"Col 1": [1, 2], "Col 2": [3, 4]})
+		df_1 = pd.DataFrame({0: [1, 2]})
+		df_2 = pd.DataFrame({0: [1, 2], 1: [3, 4]})
 
 		assert not self.differ.validate_dataframe_structures(df_1, df_2)
 
 	def test_different_number_of_rows(self, mock_show_error):
-		df_1 = pd.DataFrame({"Col 1": [1, 2]})
-		df_2 = pd.DataFrame({"Col 1": [1, 2, 3]})
+		df_1 = pd.DataFrame({0: [1, 2]})
+		df_2 = pd.DataFrame({0: [1, 2, 3]})
 
 		assert not self.differ.validate_dataframe_structures(df_1, df_2)
 
 	def test_same_number_of_columns_and_rows(self, mock_show_error):
-		df_1 = pd.DataFrame({"Col 1": [1, 2], "Col 2": [3, 4]})
-		df_2 = pd.DataFrame({"Col 1": [1, 2], "Col 2": [3, 4]})
+		df_1 = pd.DataFrame({0: [1, 2], 1: [3, 4]})
+		df_2 = pd.DataFrame({0: [1, 2], 1: [3, 4]})
 
 		assert self.differ.validate_dataframe_structures(df_1, df_2)
 
+	# Test get_dataframe_differences().
 
-class GetDataframeDifferencesTestCase(TestCase):
-	# TODO: Add tests
-	pass
+	def test_get_dataframe_differences(self, mock_show_error):
+		df_1 = pd.DataFrame({0: [1, 2, 3, 4], 1: [5, 6, 7, 8], 2: [9, 10, 11, 12], 3: [13, 14, 15, 16]})
+		df_2 = pd.DataFrame({0: [1, 20, 3, 4], 1: [5, 6, 70, 80], 2: [90, 10, 11, 12], 3: [130, 14, 15, 160]})
+		expected_df_1_differences = pd.DataFrame(
+			{
+				0: [np.nan, 2, np.nan, np.nan],
+				1: [np.nan, np.nan, 7, 8],
+				2: [9, np.nan, np.nan, np.nan],
+				3: [13, np.nan, np.nan, 16],
+			}
+		)
+		expected_df_2_differences = pd.DataFrame(
+			{
+				0: [np.nan, 20, np.nan, np.nan],
+				1: [np.nan, np.nan, 70, 80],
+				2: [90, np.nan, np.nan, np.nan],
+				3: [130, np.nan, np.nan, 160],
+			}
+		)
+		df_1_differences, df_2_differences = self.differ.get_dataframe_differences(df_1, df_2)
+
+		assert df_1_differences.equals(expected_df_1_differences)
+		assert df_2_differences.equals(expected_df_2_differences)
