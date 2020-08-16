@@ -125,8 +125,3 @@ class DiffLabTestCase(TestCase):
 class GetDataframeDifferencesTestCase(TestCase):
 	# TODO: Add tests
 	pass
-
-
-class CreateDiffReportFileTestCase(TestCase):
-	# TODO: Add tests
-	pass
