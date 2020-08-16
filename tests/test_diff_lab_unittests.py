@@ -17,7 +17,7 @@ class DiffLabTestCase(TestCase):
 	@classmethod
 	def setUpClass(cls):
 		cls.differ = Differ(tk.Tk())
-		cls.test_file_path = f"{CURRENT_PATH}\\test_data\\"
+		cls.test_file_path = f"{CURRENT_PATH}\\test_data\\unittests\\"
 
 	# Test get_description().
 
