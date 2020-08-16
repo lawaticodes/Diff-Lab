@@ -56,10 +56,11 @@ class Differ:
 		self.frame.pack()
 
 	def get_description(self):
-		"""Return the program description."""
+		"""Return the description of the program."""
 		description = (
-			"Welcome to DIFF LAB!\n\nTo start diffing, please enter the full names of the files you would like to "
-			"compare below (including the extensions).\n\nThe extensions currently supported are:"
+			"Welcome to DIFF LAB!\n\nTo start diffing, please enter below the full names of the files you would like "
+			"to compare (including the extensions). Both files must be present in your current directory.\n\nThe "
+			"extensions currently supported are:"
 		)
 
 		for extension in SUPPORTED_EXTENSIONS:
@@ -72,7 +73,7 @@ class Differ:
 		messagebox.showerror(title="Error", message=message)
 
 	def show_diff_complete_info(self, message):
-		"""Show an information window stating that the diff is complete."""
+		"""Show an information window stating that the diffing is complete."""
 		messagebox.showinfo(title="Diff Complete", message=message)
 
 	def diff_files(self):
@@ -95,25 +96,27 @@ class Differ:
 
 	def validate_file_names(self, file_1_name, file_2_name):
 		"""Validate the file names."""
+		not_valid = (False, None)
+
 		if not file_1_name or not file_2_name:
 			self.show_error("You must provide both file names.")
-			return False, None
+			return not_valid
 
 		file_1_ext = os.path.splitext(file_1_name)[1]
 		file_2_ext = os.path.splitext(file_2_name)[1]
 
 		if not file_1_ext or not file_2_ext:
 			self.show_error("You must include the extension for both files.")
-			return False, None
+			return not_valid
 
 		for extension in [file_1_ext, file_2_ext]:
 			if extension not in SUPPORTED_EXTENSIONS:
 				self.show_error(f"The extension '{extension}' is not supported.")
-				return False, None
+				return not_valid
 
 		if file_1_ext != file_2_ext:
 			self.show_error("The two files have different extensions.")
-			return False, None
+			return not_valid
 
 		return True, file_1_ext
 
@@ -180,8 +183,8 @@ class Differ:
 		"""Return the differences in the two dataframes.
 
 		The first return object should be a dataframe which contains values that only the first file has. The second
-		return object should be a dataframe which contains values that only the second file has. In both cases, if the
-		two files have the same cell value then it should be np.nan in the dataframe.
+		return object should be a dataframe which contains values that only the second file has. In both return objects,
+		if the two files have the same cell value then it should be represented as np.nan.
 		"""
 		columns = df_1.columns.tolist()
 		df_1_differences = {}
