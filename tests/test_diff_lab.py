@@ -16,6 +16,7 @@ class DiffLabTestCase(TestCase):
 	@classmethod
 	def setUpClass(cls):
 		cls.differ = Differ(tk.Tk())
+		cls.test_file_path = f"{CURRENT_PATH}\\test_data\\"
 
 	# Test get_description().
 
@@ -67,10 +68,10 @@ class DiffLabTestCase(TestCase):
 	# Test validate_file_path().
 
 	def test_file_path_exists(self, mock_show_error):
-		assert self.differ.validate_file_path(f"{CURRENT_PATH}\\test_data\\test_file_path_exists.xlsx")
+		assert self.differ.validate_file_path(self.test_file_path + "test_file_path_exists.xlsx")
 
 	def test_file_path_does_not_exist(self, mock_show_error):
-		assert not self.differ.validate_file_path(f"{CURRENT_PATH}\\test_data\\invalid_file_path.xlsx")
+		assert not self.differ.validate_file_path(self.test_file_path + "invalid_file_path.xlsx")
 
 	# Test compare_files().
 
@@ -86,13 +87,13 @@ class DiffLabTestCase(TestCase):
 	# Test open_file_as_dataframe().
 
 	def test_xlsx_extension(self, mock_show_error):
-		file_path = f"{CURRENT_PATH}\\test_data\\test_open_file_as_dataframe.xlsx"
+		file_path = self.test_file_path + "test_open_file_as_dataframe.xlsx"
 		result = self.differ.open_file_as_dataframe(file_path, ".xlsx")
 
 		assert isinstance(result, pd.DataFrame)
 
 	def test_csv_extension(self, mock_show_error):
-		file_path = f"{CURRENT_PATH}\\test_data\\test_open_file_as_dataframe.csv"
+		file_path = self.test_file_path + "test_open_file_as_dataframe.csv"
 		result = self.differ.open_file_as_dataframe(file_path, ".csv")
 
 		assert isinstance(result, pd.DataFrame)
@@ -100,10 +101,25 @@ class DiffLabTestCase(TestCase):
 	def test_other_extension(self, mock_show_error):
 		assert self.differ.open_file_as_dataframe("", ".zip") is None
 
+	# Test validate_dataframe_structures().
 
-class ValidateDataframeStructuresTestCase(TestCase):
-	# TODO: Add tests
-	pass
+	def test_different_number_of_columns(self, mock_show_error):
+		df_1 = pd.DataFrame({"Col 1": [1, 2]})
+		df_2 = pd.DataFrame({"Col 1": [1, 2], "Col 2": [3, 4]})
+
+		assert not self.differ.validate_dataframe_structures(df_1, df_2)
+
+	def test_different_number_of_rows(self, mock_show_error):
+		df_1 = pd.DataFrame({"Col 1": [1, 2]})
+		df_2 = pd.DataFrame({"Col 1": [1, 2, 3]})
+
+		assert not self.differ.validate_dataframe_structures(df_1, df_2)
+
+	def test_same_number_of_columns_and_rows(self, mock_show_error):
+		df_1 = pd.DataFrame({"Col 1": [1, 2], "Col 2": [3, 4]})
+		df_2 = pd.DataFrame({"Col 1": [1, 2], "Col 2": [3, 4]})
+
+		assert self.differ.validate_dataframe_structures(df_1, df_2)
 
 
 class GetDataframeDifferencesTestCase(TestCase):
