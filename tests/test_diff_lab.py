@@ -71,10 +71,16 @@ class DiffLabTestCase(TestCase):
 	def test_file_path_does_not_exist(self, mock_show_error):
 		assert not self.differ.validate_file_path(f"{CURRENT_PATH}\\test_data\\invalid_file_path.xlsx")
 
+	# Test compare_files().
 
-class CompareFilesTestCase(TestCase):
-	# TODO: Add tests
-	pass
+	@mock.patch("executables.diff_lab.diff_lab.Differ.validate_dataframe_structures", return_value=False)
+	def test_dataframe_structures_not_valid(self, mock_show_error, mock_validate_dataframe_structures):
+		assert self.differ.compare_files("", "", "") is None
+
+	def dataframes_not_equal(self, mock_show_error):
+		assert self.differ.compare_files(
+			"test_dataframes_are_equal_file_1.xlsx", "test_dataframes_are_equal_file_2.xlsx", ".xlsx"
+		) is None
 
 
 class OpenFileAsDataframeTestCase(TestCase):
