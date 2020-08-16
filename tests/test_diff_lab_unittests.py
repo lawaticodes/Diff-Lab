@@ -13,7 +13,7 @@ CURRENT_PATH = os.getcwd()
 
 
 @mock.patch("executables.diff_lab.diff_lab.Differ.show_error", return_value=None)
-class DiffLabTestCase(TestCase):
+class DiffLabUnitTestCase(TestCase):
 	@classmethod
 	def setUpClass(cls):
 		cls.differ = Differ(tk.Tk())
@@ -82,20 +82,20 @@ class DiffLabTestCase(TestCase):
 
 	def dataframes_not_equal(self, mock_show_error):
 		assert self.differ.compare_files(
-			"test_dataframes_are_equal_file_1.xlsx", "test_dataframes_are_equal_file_2.xlsx", ".xlsx"
+			"test_dataframes_are_equal_file_1.xlsx", "test_dataframes_are_equal_file_2.xlsx", Extensions.XLSX.value
 		) is None
 
 	# Test open_file_as_dataframe().
 
 	def test_xlsx_extension(self, mock_show_error):
 		file_path = self.test_file_path + "test_open_file_as_dataframe.xlsx"
-		result = self.differ.open_file_as_dataframe(file_path, ".xlsx")
+		result = self.differ.open_file_as_dataframe(file_path, Extensions.XLSX.value)
 
 		assert isinstance(result, pd.DataFrame)
 
 	def test_csv_extension(self, mock_show_error):
 		file_path = self.test_file_path + "test_open_file_as_dataframe.csv"
-		result = self.differ.open_file_as_dataframe(file_path, ".csv")
+		result = self.differ.open_file_as_dataframe(file_path, Extensions.CSV.value)
 
 		assert isinstance(result, pd.DataFrame)
 
