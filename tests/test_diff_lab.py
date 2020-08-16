@@ -1,6 +1,7 @@
 import os
 import tkinter as tk
 
+import pandas as pd
 from unittest import mock
 from unittest import TestCase
 
@@ -82,11 +83,22 @@ class DiffLabTestCase(TestCase):
 			"test_dataframes_are_equal_file_1.xlsx", "test_dataframes_are_equal_file_2.xlsx", ".xlsx"
 		) is None
 
+	# Test open_file_as_dataframe().
 
-class OpenFileAsDataframeTestCase(TestCase):
-	# TODO: Add tests
-	# f"{os.getcwd()}\\test_data\\{extension}\\{file_name}.{extension}"
-	pass
+	def test_xlsx_extension(self, mock_show_error):
+		file_path = f"{CURRENT_PATH}\\test_data\\test_open_file_as_dataframe.xlsx"
+		result = self.differ.open_file_as_dataframe(file_path, ".xlsx")
+
+		assert isinstance(result, pd.DataFrame)
+
+	def test_csv_extension(self, mock_show_error):
+		file_path = f"{CURRENT_PATH}\\test_data\\test_open_file_as_dataframe.csv"
+		result = self.differ.open_file_as_dataframe(file_path, ".csv")
+
+		assert isinstance(result, pd.DataFrame)
+
+	def test_other_extension(self, mock_show_error):
+		assert self.differ.open_file_as_dataframe("", ".zip") is None
 
 
 class ValidateDataframeStructuresTestCase(TestCase):
