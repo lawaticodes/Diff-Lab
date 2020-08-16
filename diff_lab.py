@@ -187,20 +187,18 @@ class Differ:
 		if the two files have the same cell value then it should be represented as np.nan.
 		"""
 		columns = df_1.columns.tolist()
+		num_of_rows = df_1.shape[0]
 		df_1_differences = {}
 		df_2_differences = {}
 
 		for col in columns:
-			df_1_values = []
-			df_2_values = []
+			df_1_values = [np.nan for n in range(num_of_rows)]
+			df_2_values = [np.nan for n in range(num_of_rows)]
 
-			for df_1_value, df_2_value in zip(df_1[col].tolist(), df_2[col].tolist()):
-				if df_1_value == df_2_value:
-					df_1_values.append(np.nan)
-					df_2_values.append(np.nan)
-				else:
-					df_1_values.append(df_1_value)
-					df_2_values.append(df_2_value)
+			for index, (df_1_value, df_2_value) in enumerate(zip(df_1[col].tolist(), df_2[col].tolist())):
+				if df_1_value != df_2_value:
+					df_1_values[index] = df_1_value
+					df_2_values[index] = df_2_value
 
 			df_1_differences[col] = df_1_values
 			df_2_differences[col] = df_2_values
