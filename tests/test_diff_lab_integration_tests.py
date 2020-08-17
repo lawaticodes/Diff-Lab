@@ -2,6 +2,7 @@ import glob
 import numpy as np
 import os
 import pandas as pd
+import tempfile
 import tkinter as tk
 
 from unittest import mock
@@ -19,32 +20,25 @@ class DiffLabIntegrationTestCase(TestCase):
 	def setUpClass(cls):
 		cls.differ = Differ(tk.Tk())
 
-	def tearDown(self):
-		for file in self.get_output_files():
-			os.remove(file)
+	def get_test_file_path(self, test_file_name):
+		return f"{os.getcwd()}\\test_data\\integration_tests\\{test_file_name}"
 
-	def get_output_files(self):
-		return glob.glob("DIFF LAB OUTPUT*.xlsx")
-
-	def get_output_file_path(self, file_name):
-		return f"{os.getcwd()}\\{file_name}"
-
-	def compare_files(self, file_1_name, file_2_name, extension):
-		file_path = f"{os.getcwd()}\\test_data\\integration_tests\\"
-		self.differ.compare_files(file_path + file_1_name, file_path + file_2_name, extension)
+	def get_output_files(self, dir_path):
+		return glob.glob(f"{dir_path}\\DIFF LAB OUTPUT*.xlsx")
 
 	def test_xlsx_files_without_merged_cells_without_differences(self, mock_show_diff_complete_info):
-		self.compare_files(
-			"test_file_1_without_merged_cells.xlsx", "test_file_1_without_merged_cells.xlsx", Extensions.XLSX.value
-		)
+		test_file_path = self.get_test_file_path("test_file_1_without_merged_cells.xlsx")
 
-		assert not self.get_output_files()
+		with tempfile.TemporaryDirectory() as temp_dir:
+			self.differ.compare_files(test_file_path, test_file_path, Extensions.XLSX.value, temp_dir)
+
+			assert not self.get_output_files(temp_dir)
 
 	def test_xlsx_files_without_merged_cells_with_differences(self, mock_show_diff_complete_info):
-		self.compare_files(
-			"test_file_1_without_merged_cells.xlsx", "test_file_2_without_merged_cells.xlsx", Extensions.XLSX.value
-		)
-		expected_df_1_differences = pd.DataFrame(
+		test_file_1_path = self.get_test_file_path("test_file_1_without_merged_cells.xlsx")
+		test_file_2_path = self.get_test_file_path("test_file_2_without_merged_cells.xlsx")
+
+		expected_file_1_differences = pd.DataFrame(
 			{
 				0: [np.nan, np.nan, 11, np.nan, np.nan],
 				1: [2, np.nan, np.nan, 17, np.nan],
@@ -53,7 +47,7 @@ class DiffLabIntegrationTestCase(TestCase):
 				4: [np.nan, np.nan, np.nan, np.nan, 25],
 			}
 		)
-		expected_df_2_differences = pd.DataFrame(
+		expected_file_2_differences = pd.DataFrame(
 			{
 				0: [np.nan, np.nan, 110, np.nan, np.nan],
 				1: [20, np.nan, np.nan, 170, np.nan],
@@ -62,16 +56,18 @@ class DiffLabIntegrationTestCase(TestCase):
 				4: [np.nan, np.nan, np.nan, np.nan, 250],
 			}
 		)
-		output_files = self.get_output_files()
 
-		assert len(output_files) == 1
+		with tempfile.TemporaryDirectory() as temp_dir:
+			self.differ.compare_files(test_file_1_path, test_file_2_path, Extensions.XLSX.value, temp_dir)
+			output_files = self.get_output_files(temp_dir)
 
-		output_file_path = self.get_output_file_path(output_files[0])
-		df_1_differences = pd.read_excel(output_file_path, sheet_name=0, index_col=None, header=None)
-		df_2_differences = pd.read_excel(output_file_path, sheet_name=1, index_col=None, header=None)
+			assert len(output_files) == 1
 
-		assert df_1_differences.equals(expected_df_1_differences)
-		assert df_2_differences.equals(expected_df_2_differences)
+			file_1_differences = pd.read_excel(output_files[0], sheet_name=0, index_col=None, header=None)
+			file_2_differences = pd.read_excel(output_files[0], sheet_name=1, index_col=None, header=None)
+
+			assert file_1_differences.equals(expected_file_1_differences)
+			assert file_2_differences.equals(expected_file_2_differences)
 
 	# def test_xlsx_files_with_merged_cells_without_differences(self, mock_show_diff_complete_info):
 	# 	self.differ.compare_files("", "", Extensions.XLSX.value)
