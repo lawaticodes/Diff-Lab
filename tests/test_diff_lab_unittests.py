@@ -71,7 +71,7 @@ class DiffLabUnitTestCase(TestCase):
 	# Test validate_file_path().
 
 	def test_file_path_exists(self, mock_show_error):
-		assert self.differ.validate_file_path(self.test_file_path + "test_file_path_exists.xlsx")
+		assert self.differ.validate_file_path(self.test_file_path + "file_path_exists.xlsx")
 
 	def test_file_path_does_not_exist(self, mock_show_error):
 		assert not self.differ.validate_file_path(self.test_file_path + "invalid_file_path.xlsx")
@@ -84,19 +84,19 @@ class DiffLabUnitTestCase(TestCase):
 
 	def dataframes_not_equal(self, mock_show_error):
 		assert self.differ.compare_files(
-			"test_dataframes_are_equal_file_1.xlsx", "test_dataframes_are_equal_file_2.xlsx", Extensions.XLSX.value
+			"dataframes_are_equal_file_1.xlsx", "dataframes_are_equal_file_2.xlsx", Extensions.XLSX.value
 		) is None
 
 	# Test open_file_as_dataframe().
 
 	def test_xlsx_extension(self, mock_show_error):
-		file_path = self.test_file_path + "test_open_file_as_dataframe.xlsx"
+		file_path = self.test_file_path + "open_file_as_dataframe.xlsx"
 		result = self.differ.open_file_as_dataframe(file_path, Extensions.XLSX.value)
 
 		assert isinstance(result, pd.DataFrame)
 
 	def test_csv_extension(self, mock_show_error):
-		file_path = self.test_file_path + "test_open_file_as_dataframe.csv"
+		file_path = self.test_file_path + "open_file_as_dataframe.csv"
 		result = self.differ.open_file_as_dataframe(file_path, Extensions.CSV.value)
 
 		assert isinstance(result, pd.DataFrame)
