@@ -23,23 +23,19 @@ class DiffLabIntegrationTestCase(TestCase):
 	def get_output_files(self, dir_path):
 		return glob.glob(f"{dir_path}\\DIFF LAB OUTPUT*.xlsx")
 
-	def compare_files_and_check_no_output(self, file_1_name, file_2_name, extension):
-		file_1_path = self.get_test_file_path(file_1_name)
-		file_2_path = self.get_test_file_path(file_2_name)
-
-		with tempfile.TemporaryDirectory() as temp_dir:
-			self.differ.compare_files(file_1_path, file_2_path, extension, temp_dir)
-
-			assert not self.get_output_files(temp_dir)
-
 	def compare_files_and_check_output(
-		self, file_1_name, file_2_name, extension, expected_file_1_differences, expected_file_2_differences
+		self, file_1_name, file_2_name, extension, expected_file_1_differences=None, expected_file_2_differences=None
 	):
 		file_1_path = self.get_test_file_path(file_1_name)
 		file_2_path = self.get_test_file_path(file_2_name)
 
 		with tempfile.TemporaryDirectory() as temp_dir:
 			self.differ.compare_files(file_1_path, file_2_path, extension, temp_dir)
+
+			if expected_file_1_differences is None and expected_file_2_differences is None:
+				assert not self.get_output_files(temp_dir)
+				return
+
 			output_files = self.get_output_files(temp_dir)
 
 			assert len(output_files) == 1
@@ -51,7 +47,7 @@ class DiffLabIntegrationTestCase(TestCase):
 			assert file_2_differences.equals(expected_file_2_differences)
 
 	def test_xlsx_without_merged_cells_without_differences(self, mock_show_diff_complete_info):
-		self.compare_files_and_check_no_output(
+		self.compare_files_and_check_output(
 			"file_1_without_merged_cells.xlsx", "file_1_without_merged_cells.xlsx", Extensions.XLSX.value
 		)
 
