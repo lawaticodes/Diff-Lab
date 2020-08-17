@@ -11,9 +11,6 @@ from unittest import TestCase
 from executables.diff_lab.diff_lab import Differ, Extensions
 
 
-CURRENT_PATH = os.getcwd()
-
-
 @mock.patch("executables.diff_lab.diff_lab.Differ.show_diff_complete_info", return_value=None)
 class DiffLabIntegrationTestCase(TestCase):
 	@classmethod
@@ -27,7 +24,7 @@ class DiffLabIntegrationTestCase(TestCase):
 		return glob.glob(f"{dir_path}\\DIFF LAB OUTPUT*.xlsx")
 
 	def test_xlsx_files_without_merged_cells_without_differences(self, mock_show_diff_complete_info):
-		test_file_path = self.get_test_file_path("test_file_1_without_merged_cells.xlsx")
+		test_file_path = self.get_test_file_path("file_1_without_merged_cells.xlsx")
 
 		with tempfile.TemporaryDirectory() as temp_dir:
 			self.differ.compare_files(test_file_path, test_file_path, Extensions.XLSX.value, temp_dir)
@@ -35,8 +32,8 @@ class DiffLabIntegrationTestCase(TestCase):
 			assert not self.get_output_files(temp_dir)
 
 	def test_xlsx_files_without_merged_cells_with_differences(self, mock_show_diff_complete_info):
-		test_file_1_path = self.get_test_file_path("test_file_1_without_merged_cells.xlsx")
-		test_file_2_path = self.get_test_file_path("test_file_2_without_merged_cells.xlsx")
+		test_file_1_path = self.get_test_file_path("file_1_without_merged_cells.xlsx")
+		test_file_2_path = self.get_test_file_path("file_2_without_merged_cells.xlsx")
 
 		expected_file_1_differences = pd.DataFrame(
 			{
