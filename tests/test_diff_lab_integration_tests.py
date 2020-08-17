@@ -35,34 +35,27 @@ class DiffLabIntegrationTestCase(TestCase):
 			}
 		)
 
-	def get_test_file_path(self, test_file_name):
-		return f"{os.getcwd()}\\test_data\\integration_tests\\{test_file_name}"
-
-	def get_output_files(self, dir_path):
-		return glob.glob(f"{dir_path}\\DIFF LAB OUTPUT*.xlsx")
-
 	def compare_files_and_check_output(
 		self, file_1_name, file_2_name, extension, expected_file_1_differences=None, expected_file_2_differences=None
 	):
-		file_1_path = self.get_test_file_path(file_1_name)
-		file_2_path = self.get_test_file_path(file_2_name)
+		test_file_dir_path = f"{os.getcwd()}\\test_data\\integration_tests\\"
+		file_1_path = test_file_dir_path + file_1_name
+		file_2_path = test_file_dir_path + file_2_name
 
 		with tempfile.TemporaryDirectory() as temp_dir:
 			self.differ.compare_files(file_1_path, file_2_path, extension, temp_dir)
+			output_files = glob.glob(f"{temp_dir}\\DIFF LAB OUTPUT*.xlsx")
 
 			if expected_file_1_differences is None and expected_file_2_differences is None:
-				assert not self.get_output_files(temp_dir)
-				return
+				assert not output_files
+			else:
+				assert len(output_files) == 1
 
-			output_files = self.get_output_files(temp_dir)
+				file_1_differences = pd.read_excel(output_files[0], sheet_name=0, index_col=None, header=None)
+				file_2_differences = pd.read_excel(output_files[0], sheet_name=1, index_col=None, header=None)
 
-			assert len(output_files) == 1
-
-			file_1_differences = pd.read_excel(output_files[0], sheet_name=0, index_col=None, header=None)
-			file_2_differences = pd.read_excel(output_files[0], sheet_name=1, index_col=None, header=None)
-
-			assert file_1_differences.equals(expected_file_1_differences)
-			assert file_2_differences.equals(expected_file_2_differences)
+				assert file_1_differences.equals(expected_file_1_differences)
+				assert file_2_differences.equals(expected_file_2_differences)
 
 	def test_xlsx_without_merged_cells_without_differences(self, mock_show_diff_complete_info):
 		self.compare_files_and_check_output(
