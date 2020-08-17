@@ -123,32 +123,32 @@ class DiffLabIntegrationTestCase(TestCase):
 			expected_file_4_differences,
 		)
 
-	# def test_xlsx_with_merged_cells_different_special(self, mock_show_diff_complete_info):
-	# 	# This test is special in the sense that the files involved do not have the same structure.
-	#
-	# 	expected_file_5_differences = pd.DataFrame(
-	# 		{
-	# 			0: [np.nan, np.nan, np.nan, np.nan, np.nan],
-	# 			1: [np.nan, np.nan, np.nan, np.nan, np.nan],
-	# 			2: [np.nan, np.nan, np.nan, np.nan, np.nan],
-	# 			3: [np.nan, np.nan, np.nan, np.nan, np.nan],
-	# 			4: [np.nan, np.nan, np.nan, np.nan, np.nan],
-	# 		}
-	# 	)
-	# 	expected_file_6_differences = pd.DataFrame(
-	# 		{
-	# 			0: [np.nan, np.nan, np.nan, np.nan, np.nan],
-	# 			1: [np.nan, np.nan, np.nan, np.nan, np.nan],
-	# 			2: [np.nan, np.nan, np.nan, np.nan, np.nan],
-	# 			3: [np.nan, np.nan, np.nan, np.nan, np.nan],
-	# 			4: [np.nan, np.nan, np.nan, np.nan, np.nan],
-	# 		}
-	# 	)
-	#
-	# 	self.compare_files_and_check_output(
-	# 		"file_5_with_merged_cells.xlsx",
-	# 		"file_6_with_merged_cells.xlsx",
-	# 		Extensions.XLSX.value,
-	# 		expected_file_5_differences,
-	# 		expected_file_6_differences,
-	# 	)
+	def test_xlsx_with_merged_cells_different_special(self, mock_show_diff_complete_info):
+		# This test is special in the sense that the files involved do not have the same structure.
+
+		expected_file_5_differences = pd.DataFrame(
+			{
+				0: [1, np.nan, np.nan, np.nan, np.nan],
+				1: [np.nan, np.nan, np.nan, np.nan, np.nan],
+				2: [np.nan, 8, 13, np.nan, 23],
+				3: [np.nan, np.nan, np.nan, 19, np.nan],
+				4: [np.nan, np.nan, np.nan, 20, 25],
+			}
+		)
+		expected_file_6_differences = pd.DataFrame(
+			{
+				0: [10, np.nan, np.nan, 16, np.nan],
+				1: [np.nan, np.nan, 12, np.nan, np.nan],
+				2: [np.nan, np.nan, np.nan, np.nan, 230],
+				3: [4, np.nan, np.nan, 190, np.nan],
+				4: [50, np.nan, 15, np.nan, np.nan],
+			}
+		)
+
+		self.compare_files_and_check_output(
+			"file_5_with_merged_cells.xlsx",
+			"file_6_with_merged_cells.xlsx",
+			Extensions.XLSX.value,
+			expected_file_5_differences,
+			expected_file_6_differences,
+		)
