@@ -13,6 +13,11 @@ from executables.diff_lab.diff_lab import Differ, Extensions
 
 @mock.patch("executables.diff_lab.diff_lab.Differ.show_diff_complete_info", return_value=None)
 class DiffLabIntegrationTestCase(TestCase):
+	"""Test the diffing of two files using Differ's compare_files function.
+
+	Note that CSV files cannot have merged cells, which is why there are no tests for them.
+	"""
+
 	@classmethod
 	def setUpClass(cls):
 		cls.differ = Differ(tk.Tk())
@@ -57,12 +62,26 @@ class DiffLabIntegrationTestCase(TestCase):
 				assert file_1_differences.equals(expected_file_1_differences)
 				assert file_2_differences.equals(expected_file_2_differences)
 
-	def test_xlsx_without_merged_cells_without_differences(self, mock_show_diff_complete_info):
+	def test_csv_same(self, mock_show_diff_complete_info):
+		self.compare_files_and_check_output(
+			"file_1_without_merged_cells.csv", "file_1_without_merged_cells.csv", Extensions.CSV.value
+		)
+
+	def test_csv_different(self, mock_show_diff_complete_info):
+		self.compare_files_and_check_output(
+			"file_1_without_merged_cells.csv",
+			"file_2_without_merged_cells.csv",
+			Extensions.CSV.value,
+			self.expected_file_1_differences,
+			self.expected_file_2_differences,
+		)
+
+	def test_xlsx_no_merged_cells_same(self, mock_show_diff_complete_info):
 		self.compare_files_and_check_output(
 			"file_1_without_merged_cells.xlsx", "file_1_without_merged_cells.xlsx", Extensions.XLSX.value
 		)
 
-	def test_xlsx_without_merged_cells_with_differences(self, mock_show_diff_complete_info):
+	def test_xlsx_no_merged_cells_different(self, mock_show_diff_complete_info):
 		self.compare_files_and_check_output(
 			"file_1_without_merged_cells.xlsx",
 			"file_2_without_merged_cells.xlsx",
@@ -71,12 +90,12 @@ class DiffLabIntegrationTestCase(TestCase):
 			self.expected_file_2_differences,
 		)
 
-	def test_xlsx_with_merged_cells_without_differences(self, mock_show_diff_complete_info):
+	def test_xlsx_with_merged_cells_same(self, mock_show_diff_complete_info):
 		self.compare_files_and_check_output(
 			"file_3_with_merged_cells.xlsx", "file_3_with_merged_cells.xlsx", Extensions.XLSX.value
 		)
 
-	def test_xlsx_with_merged_cells_with_differences(self, mock_show_diff_complete_info):
+	def test_xlsx_with_merged_cells_different(self, mock_show_diff_complete_info):
 		expected_file_3_differences = pd.DataFrame(
 			{
 				0: [1, np.nan, np.nan, np.nan, np.nan],
@@ -104,16 +123,32 @@ class DiffLabIntegrationTestCase(TestCase):
 			expected_file_4_differences,
 		)
 
-	def test_csv_without_merged_cells_without_differences(self, mock_show_diff_complete_info):
-		self.compare_files_and_check_output(
-			"file_1_without_merged_cells.csv", "file_1_without_merged_cells.csv", Extensions.CSV.value
-		)
-
-	def test_csv_without_merged_cells_with_differences(self, mock_show_diff_complete_info):
-		self.compare_files_and_check_output(
-			"file_1_without_merged_cells.csv",
-			"file_2_without_merged_cells.csv",
-			Extensions.CSV.value,
-			self.expected_file_1_differences,
-			self.expected_file_2_differences,
-		)
+	# def test_xlsx_with_merged_cells_different_special(self, mock_show_diff_complete_info):
+	# 	# This test is special in the sense that the files involved do not have the same structure.
+	#
+	# 	expected_file_5_differences = pd.DataFrame(
+	# 		{
+	# 			0: [np.nan, np.nan, np.nan, np.nan, np.nan],
+	# 			1: [np.nan, np.nan, np.nan, np.nan, np.nan],
+	# 			2: [np.nan, np.nan, np.nan, np.nan, np.nan],
+	# 			3: [np.nan, np.nan, np.nan, np.nan, np.nan],
+	# 			4: [np.nan, np.nan, np.nan, np.nan, np.nan],
+	# 		}
+	# 	)
+	# 	expected_file_6_differences = pd.DataFrame(
+	# 		{
+	# 			0: [np.nan, np.nan, np.nan, np.nan, np.nan],
+	# 			1: [np.nan, np.nan, np.nan, np.nan, np.nan],
+	# 			2: [np.nan, np.nan, np.nan, np.nan, np.nan],
+	# 			3: [np.nan, np.nan, np.nan, np.nan, np.nan],
+	# 			4: [np.nan, np.nan, np.nan, np.nan, np.nan],
+	# 		}
+	# 	)
+	#
+	# 	self.compare_files_and_check_output(
+	# 		"file_5_with_merged_cells.xlsx",
+	# 		"file_6_with_merged_cells.xlsx",
+	# 		Extensions.XLSX.value,
+	# 		expected_file_5_differences,
+	# 		expected_file_6_differences,
+	# 	)

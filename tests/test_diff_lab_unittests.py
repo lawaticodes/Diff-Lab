@@ -14,6 +14,8 @@ CURRENT_PATH = os.getcwd()
 
 @mock.patch("executables.diff_lab.diff_lab.Differ.show_error", return_value=None)
 class DiffLabUnitTestCase(TestCase):
+	"""Test various functions defined on the Differ model."""
+
 	@classmethod
 	def setUpClass(cls):
 		cls.differ = Differ(tk.Tk())
