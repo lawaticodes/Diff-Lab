@@ -133,7 +133,7 @@ class Differ:
 
 		return True
 
-	def compare_files(self, file_1_path, file_2_path, extension):
+	def compare_files(self, file_1_path, file_2_path, extension, diff_report_dir_path=CURRENT_PATH):
 		"""Compare the two files for any differences."""
 		df_1 = self.open_file_as_dataframe(file_1_path, extension)
 		df_2 = self.open_file_as_dataframe(file_2_path, extension)
@@ -146,7 +146,7 @@ class Differ:
 			return
 
 		df_1_differences, df_2_differences = self.get_dataframe_differences(df_1, df_2)
-		self.create_diff_report_file(df_1_differences, df_2_differences)
+		self.create_diff_report_file(df_1_differences, df_2_differences, CURRENT_PATH)
 
 		self.show_diff_complete_info(
 			"The two files are not identical to each other. Please open the file titled 'DIFF LAB OUTPUT' with the "
@@ -206,7 +206,7 @@ class Differ:
 
 		return pd.DataFrame.from_dict(df_1_differences), pd.DataFrame.from_dict(df_2_differences)
 
-	def create_diff_report_file(self, df_1_differences,  df_2_differences):
+	def create_diff_report_file(self, df_1_differences,  df_2_differences, diff_report_dir_path):
 		"""Create a .xlsx file containing the differences in the two files.
 
 		The first sheet should contain values that only the first file has. The second sheet should contain values that
@@ -215,7 +215,7 @@ class Differ:
 		df_1_differences = df_1_differences.style.applymap(lambda v: self.apply_background_colour(v))
 		df_2_differences = df_2_differences.style.applymap(lambda v: self.apply_background_colour(v))
 		timestamp = datetime.datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
-		file_name = f"DIFF LAB OUTPUT {timestamp}.xlsx"
+		file_name = f"{diff_report_dir_path}\\DIFF LAB OUTPUT {timestamp}.xlsx"
 
 		with pd.ExcelWriter(file_name, mode="w") as writer:
 			df_1_differences.to_excel(writer, sheet_name="File 1 differences", header=False, index=False)
