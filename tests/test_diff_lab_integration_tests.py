@@ -34,12 +34,6 @@ class DiffLabIntegrationTestCase(TestCase):
 				4: [np.nan, np.nan, np.nan, np.nan, 250],
 			}
 		)
-		cls.expected_file_3_differences = pd.DataFrame(
-			{}
-		)
-		cls.expected_file_4_differences = pd.DataFrame(
-			{}
-		)
 
 	def compare_files_and_check_output(
 		self, file_1_name, file_2_name, extension, expected_file_1_differences=None, expected_file_2_differences=None
@@ -82,8 +76,33 @@ class DiffLabIntegrationTestCase(TestCase):
 			"file_3_with_merged_cells.xlsx", "file_3_with_merged_cells.xlsx", Extensions.XLSX.value
 		)
 
-	# def test_xlsx_with_merged_cells_with_differences(self, mock_show_diff_complete_info):
-	# 	self.differ.compare_files("", "", Extensions.XLSX.value)
+	def test_xlsx_with_merged_cells_with_differences(self, mock_show_diff_complete_info):
+		expected_file_3_differences = pd.DataFrame(
+			{
+				0: [1, np.nan, np.nan, np.nan, np.nan],
+				1: [np.nan, np.nan, 12, 17, 22],
+				2: [np.nan, np.nan, np.nan, np.nan, np.nan],
+				3: [np.nan, 9, np.nan, np.nan, np.nan],
+				4: [np.nan, 10, np.nan, np.nan, np.nan],
+			}
+		)
+		expected_file_4_differences = pd.DataFrame(
+			{
+				0: [10, np.nan, np.nan, np.nan, np.nan],
+				1: [np.nan, np.nan, 120, 170, 220],
+				2: [np.nan, np.nan, np.nan, np.nan, np.nan],
+				3: [np.nan, 90, np.nan, np.nan, np.nan],
+				4: [np.nan, 100, np.nan, np.nan, np.nan],
+			}
+		)
+
+		self.compare_files_and_check_output(
+			"file_3_with_merged_cells.xlsx",
+			"file_4_with_merged_cells.xlsx",
+			Extensions.XLSX.value,
+			expected_file_3_differences,
+			expected_file_4_differences,
+		)
 
 	def test_csv_without_merged_cells_without_differences(self, mock_show_diff_complete_info):
 		self.compare_files_and_check_output(
