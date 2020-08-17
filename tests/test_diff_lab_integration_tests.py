@@ -32,15 +32,30 @@ class DiffLabIntegrationTestCase(TestCase):
 
 			assert not self.get_output_files(temp_dir)
 
+	def compare_files_and_check_output(
+		self, file_1_name, file_2_name, extension, expected_file_1_differences, expected_file_2_differences
+	):
+		file_1_path = self.get_test_file_path(file_1_name)
+		file_2_path = self.get_test_file_path(file_2_name)
+
+		with tempfile.TemporaryDirectory() as temp_dir:
+			self.differ.compare_files(file_1_path, file_2_path, extension, temp_dir)
+			output_files = self.get_output_files(temp_dir)
+
+			assert len(output_files) == 1
+
+			file_1_differences = pd.read_excel(output_files[0], sheet_name=0, index_col=None, header=None)
+			file_2_differences = pd.read_excel(output_files[0], sheet_name=1, index_col=None, header=None)
+
+			assert file_1_differences.equals(expected_file_1_differences)
+			assert file_2_differences.equals(expected_file_2_differences)
+
 	def test_xlsx_without_merged_cells_without_differences(self, mock_show_diff_complete_info):
 		self.compare_files_and_check_no_output(
 			"file_1_without_merged_cells.xlsx", "file_1_without_merged_cells.xlsx", Extensions.XLSX.value
 		)
 
 	def test_xlsx_without_merged_cells_with_differences(self, mock_show_diff_complete_info):
-		test_file_1_path = self.get_test_file_path("file_1_without_merged_cells.xlsx")
-		test_file_2_path = self.get_test_file_path("file_2_without_merged_cells.xlsx")
-
 		expected_file_1_differences = pd.DataFrame(
 			{
 				0: [np.nan, np.nan, 11, np.nan, np.nan],
@@ -60,17 +75,13 @@ class DiffLabIntegrationTestCase(TestCase):
 			}
 		)
 
-		with tempfile.TemporaryDirectory() as temp_dir:
-			self.differ.compare_files(test_file_1_path, test_file_2_path, Extensions.XLSX.value, temp_dir)
-			output_files = self.get_output_files(temp_dir)
-
-			assert len(output_files) == 1
-
-			file_1_differences = pd.read_excel(output_files[0], sheet_name=0, index_col=None, header=None)
-			file_2_differences = pd.read_excel(output_files[0], sheet_name=1, index_col=None, header=None)
-
-			assert file_1_differences.equals(expected_file_1_differences)
-			assert file_2_differences.equals(expected_file_2_differences)
+		self.compare_files_and_check_output(
+			"file_1_without_merged_cells.xlsx",
+			"file_2_without_merged_cells.xlsx",
+			Extensions.XLSX.value,
+			expected_file_1_differences,
+			expected_file_2_differences,
+		)
 
 	# def test_xlsx_with_merged_cells_without_differences(self, mock_show_diff_complete_info):
 	# 	self.differ.compare_files("", "", Extensions.XLSX.value)
