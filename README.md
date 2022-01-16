@@ -1,4 +1,4 @@
-# DIFF LAB
+# :page_facing_up: DIFF LAB :page_facing_up:
 
 An app designed to show the differences between 2 different Excel files. This is best suited for comparing files with the same format.
 
