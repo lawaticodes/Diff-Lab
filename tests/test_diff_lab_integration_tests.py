@@ -8,10 +8,10 @@ import tkinter as tk
 from unittest import mock
 from unittest import TestCase
 
-from executables.diff_lab.diff_lab import Differ, Extensions
+from diff_lab import Differ, Extensions
 
 
-@mock.patch("executables.diff_lab.diff_lab.Differ.show_diff_complete_info", return_value=None)
+@mock.patch("diff_lab.Differ.show_diff_complete_info", return_value=None)
 class DiffLabIntegrationTestCase(TestCase):
 	"""Test the diffing of two files using Differ's compare_files function.
 
@@ -43,7 +43,7 @@ class DiffLabIntegrationTestCase(TestCase):
 	def compare_files_and_check_output(
 		self, file_1_name, file_2_name, extension, expected_file_1_differences=None, expected_file_2_differences=None
 	):
-		test_file_dir_path = f"{os.getcwd()}\\test_data\\integration_tests\\"
+		test_file_dir_path = f"{os.getcwd()}\\tests\\test_data\\integration_tests\\"
 		file_1_path = test_file_dir_path + file_1_name
 		file_2_path = test_file_dir_path + file_2_name
 

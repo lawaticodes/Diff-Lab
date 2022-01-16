@@ -6,20 +6,20 @@ import tkinter as tk
 from unittest import mock
 from unittest import TestCase
 
-from executables.diff_lab.diff_lab import Differ, DESCRIPTION, Extensions
+from diff_lab import Differ, DESCRIPTION, Extensions
 
 
 CURRENT_PATH = os.getcwd()
 
 
-@mock.patch("executables.diff_lab.diff_lab.Differ.show_error", return_value=None)
+@mock.patch("diff_lab.Differ.show_error", return_value=None)
 class DiffLabUnitTestCase(TestCase):
 	"""Test various functions defined on the Differ model."""
 
 	@classmethod
 	def setUpClass(cls):
 		cls.differ = Differ(tk.Tk())
-		cls.test_file_path = f"{CURRENT_PATH}\\test_data\\unittests\\"
+		cls.test_file_path = f"{CURRENT_PATH}\\tests\\test_data\\unittests\\"
 
 	# Test get_description().
 
@@ -28,11 +28,11 @@ class DiffLabUnitTestCase(TestCase):
 
 	# Test diff_files().
 
-	@mock.patch("executables.diff_lab.diff_lab.Differ.validate_file_names", return_value=(False, None))
+	@mock.patch("diff_lab.Differ.validate_file_names", return_value=(False, None))
 	def test_invalid_file_name(self, mock_show_error, mock_validate_file_names):
 		assert self.differ.diff_files() is None
 
-	@mock.patch("executables.diff_lab.diff_lab.Differ.validate_file_path", return_value=False)
+	@mock.patch("diff_lab.Differ.validate_file_path", return_value=False)
 	def test_invalid_file_path(self, mock_show_error, mock_file_path):
 		assert self.differ.diff_files() is None
 
@@ -78,7 +78,7 @@ class DiffLabUnitTestCase(TestCase):
 
 	# Test compare_files().
 
-	@mock.patch("executables.diff_lab.diff_lab.Differ.validate_dataframe_structures", return_value=False)
+	@mock.patch("diff_lab.Differ.validate_dataframe_structures", return_value=False)
 	def test_dataframe_structures_not_valid(self, mock_show_error, mock_validate_dataframe_structures):
 		assert self.differ.compare_files("", "", "") is None
 
